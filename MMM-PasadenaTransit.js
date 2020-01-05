@@ -16,6 +16,10 @@ Module.register('MMM-PasadenaTransit', {
 		}, this.config.updateInterval);
 	},
 
+	getStyles: function () {
+		return ['MMM-PasadenaTransit.css'];
+	},
+
 	// Override dom generator.
 	getDom: function() {
 		var wrapper = document.createElement('div');

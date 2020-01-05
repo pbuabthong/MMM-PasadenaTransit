@@ -35,12 +35,9 @@ module.exports = NodeHelper.create({
 
 	getDeparturesByStopCode: function(stopCode) {
 		// get ETA from a single StopID
-		console.log(stopCode);
 		return new Promise((resolve, reject) => {
-			console.log(stopCode);
 			stopID = this.getStopIDFromStopCode(stopCode);
 			request(this.getRequestObj(stopID), function(err, response, body) {
-				console.log('after request' + stopCode);
 				if (!err && response.statusCode == 200) {
 					xmlRaw = body;
 					// uncomment below to test local xml
@@ -70,7 +67,6 @@ module.exports = NodeHelper.create({
 					});
 
 					ptHelper.sortETA(departures);
-					console.log(departures);
 					resolve(departures);
 				} else {
 					console.log(err);
@@ -85,7 +81,6 @@ module.exports = NodeHelper.create({
 		// get ETA from a given StopID AND the stop across the street
 		this.getDeparturesByStopCode(stopCode)
 			.then((departures) => {
-				console.log('after then' + stopCode);
 				this.sendSocketNotification('DEPARTURES', {
 					stop_code: stopCode,
 					stop_name: this.getStopNameFromStopCode(stopCode),
