@@ -1,7 +1,6 @@
 Module.register('MMM-PasadenaTransit', {
 
 	defaults: { // Start with the information needed for a single stop
-		text: 'test',
 		updateInterval : 30000, // 30 seconds
 	},
 
@@ -9,9 +8,6 @@ Module.register('MMM-PasadenaTransit', {
 		Log.info('Starting module: ' + this.name);
 
 		var self = this;
-		this.sendSocketNotification('SET_STOP_CODE', {
-			config: this.config
-		});
 
 		this.getDepartureInfo();
 		// Schedule update timer.
@@ -75,8 +71,10 @@ Module.register('MMM-PasadenaTransit', {
 	// Override notification handler.
 	socketNotificationReceived: function(notification, payload) {
 		if (notification === 'DEPARTURES') {
-			this.info = payload;
-			this.updateDom();
+			if (payload.stop_code == this.config.stopCode) {
+				this.info = payload;
+				this.updateDom();
+			}
 		}
 	},
 

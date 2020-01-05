@@ -15,12 +15,12 @@ module.exports = NodeHelper.create({
 		console.log('Starting PasadenaTransit node helper');
 	},
 
-	setStopCode: function(stopCode) {
-		stopInfo = stopsJSON[stopCode];
-		stopInfo.stop_id = Number(stopInfo.stop_id);
-		if(stopInfo.similar_stop) {
-			stopInfo.similar_stop = Number(stopInfo.similar_stop);
-		}
+	getStopIDFromStopCode: function(stopCode) {
+		return Number(stopsJSON[stopCode].stop_id);
+	},
+
+	getStopNameFromStopCode: function(stopCode) {
+		return stopsJSON[stopCode].stop_name;
 	},
 
 	getRequestObj: function(stopID) {
@@ -33,16 +33,26 @@ module.exports = NodeHelper.create({
 		return {url:url, qs: propertiesObject};
 	},
 
-	getDeparturesByStopID: function(stopID) {
+	getDeparturesByStopCode: function(stopCode) {
 		// get ETA from a single StopID
+		console.log(stopCode);
 		return new Promise((resolve, reject) => {
-			departures = [];
+			console.log(stopCode);
+			stopID = this.getStopIDFromStopCode(stopCode);
 			request(this.getRequestObj(stopID), function(err, response, body) {
+				console.log('after request' + stopCode);
 				if (!err && response.statusCode == 200) {
 					xmlRaw = body;
-					xmlRaw = '<RoutePositionETFM> <Content Expires="2020-01-03T18:01:31-08:00"/> <Route RouteNo="10" Name="Old Pasadena - PCC - Allen Station"> <Destination Name="Allen Gold Line Station"> <Trip ETA="10' + config.stopCode + '" TripID="1297" RouteTag="33" RP="0.15732"/> <Trip ETA="16" TripID="1132" RouteTag="33" RouteTag0="13" RP0="0.92746"/> <Trip ETA="36" TripID="18" RouteTag="33" X="-13148312" Y="-4049151"> </Trip> </Destination> </Route> </RoutePositionETFM> ';
+					// uncomment below to test local xml
+					// xmlTest = '<RoutePositionETFM> <Content Expires="2020-01-03T18:01:31-08:00"/> ';
+					// xmlTest += '<Route RouteNo="10" Name="Old Pasadena - PCC - Allen Station"> <Destination Name="Allen Gold Line Station">';
+					// xmlTest += '<Trip ETA="10' + stopCode + '" TripID="1297" RouteTag="33" RP="0.15732"/> <Trip ETA="16" ';
+					// xmlTest += 'TripID="1132" RouteTag="33" RouteTag0="13" RP0="0.92746"/> <Trip ETA="36" TripID="18" RouteTag="33" ';
+					// xmlTest += 'X="-13148312" Y="-4049151"> </Trip> </Destination> </Route> </RoutePositionETFM> ';
+					// xmlRaw = xmlTest;
 					parseString(xmlRaw, (err, result) => {
 						var parsed = result;
+						departures = [];
 						if(parsed.RoutePositionETFM.Route) {
 							parsed.RoutePositionETFM.Route.forEach((route) => {
 								route.Destination[0].Trip.forEach((trip) => {
@@ -60,6 +70,7 @@ module.exports = NodeHelper.create({
 					});
 
 					ptHelper.sortETA(departures);
+					console.log(departures);
 					resolve(departures);
 				} else {
 					console.log(err);
@@ -69,34 +80,34 @@ module.exports = NodeHelper.create({
 		});
 	},
 
-	getAllDeparturesByStopID: async function(stopID) {
+	getAllDeparturesByStopCode: function(stopCode) {
 		var self = this;
 		// get ETA from a given StopID AND the stop across the street
-		try {
-			var departures = await this.getDeparturesByStopID(stopID);
-			if (stopInfo.similar_stop) {
-				var similarStopDepartures = await this.getDeparturesByStopID(stopInfo.similar_stop);
-				departures = departures.concat(similarStopDepartures);
-				ptHelper.sortETA(departures);
-			}
-			self.sendSocketNotification('DEPARTURES', {
-				stop_name: stopInfo.stop_name,
-				departures: departures,
+		this.getDeparturesByStopCode(stopCode)
+			.then((departures) => {
+				console.log('after then' + stopCode);
+				this.sendSocketNotification('DEPARTURES', {
+					stop_code: stopCode,
+					stop_name: this.getStopNameFromStopCode(stopCode),
+					departures: departures,
+				});
+			})
+			.catch((err) => {
+				console.log(err);
 			});
-		} catch(err) {
-			console.log(err);
-		}
+		// if (stopInfo.similar_stop) {
+		// 	var similarStopDepartures = this.getDeparturesByStopID(stopInfo.similar_stop);
+		// 	departures = departures.concat(similarStopDepartures);
+		// 	ptHelper.sortETA(departures);
+		// }
 	},
 
-	socketNotificationReceived: async function(notification, payload) {
+	socketNotificationReceived: function(notification, payload) {
 		var self = this;
 		console.log('Notification: ' + notification + ' Payload: ' + payload);
 		config = payload.config;
 		if(notification === 'GET_DEPARTURE') {
-			this.setStopCode(payload.config.stopCode);
-			this.getAllDeparturesByStopID(stopInfo.stop_id);
-		} else if(notification === 'SET_STOP_CODE') {
-			this.setStopCode(payload.config.stopCode);
+			this.getAllDeparturesByStopCode(payload.config.stopCode);
 		}
 	}
 });

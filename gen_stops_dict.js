@@ -29,6 +29,7 @@ stopsDict = {};
 stopsJson.forEach((stop) => {
 	stopsDict[stop.stop_code]={
 		'stop_id': stop.stop_id,
+		'stop_code': stop.stop_code,
 		'stop_name': stop.stop_name,
 		'similar_stop': getSimilarStop(stop.stop_id, stop.stop_name)
 	};
