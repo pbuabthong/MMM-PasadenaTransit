@@ -87,7 +87,7 @@ modules: [
 ]
 ```
 
-![Screenshot of Pasadena stop code lookup](screenshots/Stopcode.png)
+![Screenshot of Pasadena stop code lookup](screenshots/Stopcodes.png)
 
 
 ## Configuration options
