@@ -1,3 +1,10 @@
+// Magic Mirror
+// Module: MMM-PasadenaTransit
+// 
+// By Pai Buabthong https://github.com/pbuabthong
+// MIT Licensed.
+// 
+
 Module.register('MMM-PasadenaTransit', {
 
 	defaults: { // Start with the information needed for a single stop

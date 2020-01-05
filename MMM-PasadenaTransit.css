@@ -1,7 +1,9 @@
 .route_no {
   padding-left: 0;
-  padding-right: 15px;
-  font-size: small;
+  padding-right: 5px;
+  text-align: left;
+  font-size: normal;
+  font-weight: bold;
 }
 
 .route_name {
@@ -12,5 +14,5 @@
 .eta {
   padding-right: 10px;
   text-align: right;
-  font-size: small;
+  font-size: normal;
 }
