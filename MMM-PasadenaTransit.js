@@ -72,6 +72,9 @@ Module.register('MMM-PasadenaTransit', {
 
 	// Override get header function
 	getHeader: function() {
+		if (this.config.header) {
+			return this.config.header;
+		}
 		if (this.info) {
 			console.log(this.info.stop_name);
 			return this.info.stop_name;

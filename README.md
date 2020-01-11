@@ -73,6 +73,7 @@ modules: [
     {
         module: 'MMM-PasadenaTransit',
         position: 'top_right',
+        header: 'Northease corner',
         config: {
             stopCode: 13681 ,
         }
@@ -94,6 +95,7 @@ modules: [
 Option|Description
 ------|-----------
 `stopCode`|stop_code (shown as 'Stop #' in [Pasadena Transit map][stoplookup] A.<br/>**Expected Value type:** `int`.
+`header`|Header of the module block (optional: default to the name of the bus stop).<br/>**Expected Value type:** `string`.
 `updateInterval`|Time between updates, in seconds. To protect API abuse, this module automatically limits this value to a minimum of `10`.<br/>**Expected Value type:** `int`.
 
 ## Planned Features
