@@ -24,7 +24,7 @@ module.exports = NodeHelper.create({
 	},
 
 	getRequestObj: function(stopID) {
-		var url = 'https://rt.pasadenatransit.net/rtt/public/Utility/File.aspx?ContentType=SQLXML&Name=RoutePositionETForMap2&PlatformTag';
+		var url = 'http://rt.pasadenatransit.net/rtt/public/Utility/File.aspx?ContentType=SQLXML&Name=RoutePositionETForMap2&PlatformTag';
 		var propertiesObject = {
 			ContentType: 'SQLXML',
 			Name: 'RoutePositionETForMap2',
